@@ -46,18 +46,19 @@ function shuffle(array) {
 }
 
 function    bt(grid, rec) {
-    if (rec > 999)
-        return true;
-    ec = get_empty_cell(grid);
+    //if (rec > 999)
+    //    return true;
+    rec[0]++;
+    var ec = get_empty_cell(grid);
     if (ec == null)
         return true; // No empty cell left, a solution has been reached!
-    pool = [1,2,3,4,5,6,7,8,9];
+    var pool = [1,2,3,4,5,6,7,8,9];
     shuffle(pool);
     for (var i = 0; i < 9; i++) {
         if (is_play_valid(grid, ec, pool[i])) {
             var [x, y] = ec;
             grid[y][x] = pool[i];
-            var r = bt(grid, rec + 1);
+            var r = bt(grid, rec);
             if (r)
                 return true;
             else
@@ -72,9 +73,9 @@ function    getRandomInt (min, max) {
 }
 
 function    randomInsert(grid) {
-    wherex = getRandomInt(0, 8);
-    wherey = getRandomInt(0, 8);
-    whichn = getRandomInt(1, 9);
+    var wherex = getRandomInt(0, 8);
+    var wherey = getRandomInt(0, 8);
+    var whichn = getRandomInt(1, 9);
     if (is_play_valid(grid, [wherex, wherey], whichn)) {
         grid[wherey][wherex] = whichn;
         return true;
@@ -83,13 +84,15 @@ function    randomInsert(grid) {
 }
 
 function    randomRemove(grid) {
-    x = getRandomInt(0, 8);
-    y = getRandomInt(0, 8);
+    var x = getRandomInt(0, 8);
+    var y = getRandomInt(0, 8);
     if (grid[y][x] != 0) {
         grid[y][x] = 0;
-        return true;
+        //return true;
+        return [x, y];
     }
-    return false;
+    return null;
+    //return false;
 }
 
 function    dbgDisp(grid) {
@@ -113,21 +116,31 @@ function    getSudokuGrid() {
             i++;
     }
     // Solve it
-    if (!bt(grid, 0)) {
+    var rec = [0];
+    if (!bt(grid, rec)) {
         return null;
     }
     // Put holes
-    i = 0;
-    j = 0;
-    rmn = 2*9**2/3;
+    var i = 0;
+    var j = 0;
+    var rmn = 2*9**2/3;
+    var rems = [];
     while (i < rmn) {
-        if (randomRemove(grid))
+        var rm = randomRemove(grid);
+        if (rm) {
             i++;
+            rems.push(rm);
+        }
         j++;
         if (j > 10 * rmn)
             break;
     }
-    return (grid);
+    rec = [0]
+    bt(grid, rec);
+    for (i = 0; i < rems.length; i++) {
+        grid[rems[i][1]][rems[i][0]] = 0;
+    }
+    return ([grid, rec[0]]);
 }
 
 function checkGrid() {
@@ -189,12 +202,23 @@ function    grid2table(g, tab)
     }
 }
 
+function    rec2diff(v) {
+    if (v < 1000)
+        return _("Easy", "sudoku");
+    else if (v < 10000)
+        return _("Medium", "sudoku");
+    else
+        return _("Hard", "sudoku");
+}
+
 function    Generate() {
     var table = document.getElementById("dokutab");
 
-    g = getSudokuGrid();
+    var g = getSudokuGrid();
     if (g) {
+        var [g, h] = g
         grid2table(g, table);
+        document.getElementById("difficulty").innerText = rec2diff(h);
     }
 }
 

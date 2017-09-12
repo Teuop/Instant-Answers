@@ -2,6 +2,7 @@ var _ = require('@qwant/front-i18n')._;
 var sha1 = require('sha1');
 var createHash = require('sha.js');
 var md5 = require('md5');
+var b64 = require('base64');
 
 var commonEntities = [
     {char : "<", html : "&lt;"},
@@ -48,6 +49,9 @@ module.exports = {
             case 'MD5':
                 result = md5(stringToHash);
                 break;
+            case 'BASE64':
+            case 'B64':
+                result = base64(stringToHash);
         }
         return {
             result: result,

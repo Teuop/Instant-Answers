@@ -43,6 +43,11 @@
             <button type="button" id="dokunew" class="__ia__sudoku__sdkubutton">
                 {{= _("New Game", "sudoku") }}
             </button>
+         <p>
+            {{= _("Difficulty: ", "sudoku") }}
+            <span id="difficulty">
+            </span>
+        </p>
         </div>
     </div>
   </div>
